@@ -1,0 +1,6 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "omar-hesham-foundation",
+  "compatibility_date": "2025-07-05",
+  "pages_build_output_dir": "./dist"
+}

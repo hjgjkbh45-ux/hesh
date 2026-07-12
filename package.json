@@ -1,0 +1,23 @@
+{
+  "name": "omar-hesham-foundation",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "wrangler pages dev dist",
+    "dev:sandbox": "wrangler pages dev dist --ip 0.0.0.0 --port 3000",
+    "deploy": "npm run build && wrangler pages deploy dist"
+  },
+  "dependencies": {
+    "@hono/vite-cloudflare-pages": "^0.4.2",
+    "hono": "^4.9.6"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250705.0",
+    "typescript": "^5.8.3",
+    "vite": "^5.4.19",
+    "wrangler": "^3.114.15"
+  }
+}
