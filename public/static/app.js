@@ -2,13 +2,24 @@
   const $ = (s, root = document) => root.querySelector(s)
   const $$ = (s, root = document) => [...root.querySelectorAll(s)]
 
-  const toast = (message) => {
+  const toast = (message, type = 'success') => {
     const box = $('#toast')
     if (!box) return
-    $('span', box).textContent = message
-    box.classList.add('show')
+    const isError = type === 'error'
+    const icon = $('.toast-icon i', box)
+    const title = $('.toast-content strong', box)
+    const text = $('.toast-message', box)
+
     clearTimeout(window.__toastTimer)
-    window.__toastTimer = setTimeout(() => box.classList.remove('show'), 4200)
+    box.classList.remove('show', 'is-success', 'is-error')
+    box.classList.add(isError ? 'is-error' : 'is-success')
+    if (icon) icon.className = `fa-solid ${isError ? 'fa-xmark' : 'fa-check'}`
+    if (title) title.textContent = isError ? 'حدث خطأ' : 'تم بنجاح'
+    if (text) text.textContent = message
+
+    void box.offsetWidth
+    box.classList.add('show')
+    window.__toastTimer = setTimeout(() => box.classList.remove('show'), 2800)
   }
 
   window.addEventListener('load', () => {
@@ -42,14 +53,24 @@
   const savedTheme = localStorage.getItem('omar-theme')
   if (savedTheme === 'dark') document.body.classList.add('dark')
   const updateThemeIcon = () => {
+    const isDark = document.body.classList.contains('dark')
     const i = $('#theme-toggle i')
-    if (i) i.className = `fa-solid ${document.body.classList.contains('dark') ? 'fa-sun' : 'fa-moon'}`
+    const themeColor = $('meta[name="theme-color"]')
+    if (i) i.className = `fa-solid ${isDark ? 'fa-sun' : 'fa-moon'}`
+    if (themeColor) themeColor.setAttribute('content', isDark ? '#071d1a' : '#f9f6ee')
+    document.documentElement.style.colorScheme = isDark ? 'dark' : 'light'
   }
   updateThemeIcon()
   $('#theme-toggle')?.addEventListener('click', () => {
     document.body.classList.toggle('dark')
     localStorage.setItem('omar-theme', document.body.classList.contains('dark') ? 'dark' : 'light')
     updateThemeIcon()
+  })
+
+  $$('.mobile-bottom a').forEach(link => {
+    const href = link.getAttribute('href')
+    const isCurrent = href === '/' ? location.pathname === '/' : location.pathname.startsWith(href)
+    if (isCurrent) link.setAttribute('aria-current', 'page')
   })
 
   const revealObserver = new IntersectionObserver(entries => {
@@ -88,7 +109,7 @@
       button.innerHTML = '<i class="fa-solid fa-check"></i> تم النسخ'
       setTimeout(() => { button.innerHTML = original }, 1800)
     } catch {
-      toast('حدد الرقم وانسخه يدويًا')
+      toast('حدد الرقم وانسخه يدويًا', 'error')
     }
   }))
 
@@ -120,7 +141,7 @@
       toast(result.message || 'تم استلام طلبك بنجاح')
       if (!form.classList.contains('donation-form')) form.reset()
     } catch (error) {
-      toast(error.message || 'تعذر الإرسال الآن، حاول مرة أخرى')
+      toast(error.message || 'تعذر الإرسال الآن، حاول مرة أخرى', 'error')
     } finally {
       if (submit) {
         submit.disabled = false
